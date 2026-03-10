@@ -1,7 +1,13 @@
-title: "봇 로그 모니터"
-version: "1.0.33"
+title: "봇 로그 모니터/다운로더"
+version: "0.0.0"
 package_name: "bot_log_monitor"
-developer: "custom"
-description: "GDS Tool 로그 모니터링 + TMDB 메타데이터 자동 수집 + 외국 VOD 분리 + Discord 알림 + 폴더 복사 + 감시 경로 규칙 + 실제 영화 폴더 자동 탐색 + TMDB ID 없어도 제목 검색 + 여러 버전 모두 복사 + 스마트 캐시 + 정규화 비교 + tail -F 실시간 모니터링 + REFRESH 모드 자동 재스캔 + 자막 파일 자동 복사 + Discord 브로드캐스트 + bot_downloader KD 코드 + 에피소드 번호 수정 (v1.0.33)"
-home: ""
-more: ""
+developer: "njworange"
+description: "GDS 업데이트 정보 수신 및 다운로드"
+home: "https://github.com/njworange/bot_log_monitor"
+more: "https://raw.githubusercontent.com/njworange/bot_log_monitor/main/README.md"
+
+require_plugin: "gds_tool"
+require_os' : ""
+need_decrypt_code: false
+need_filesize_check': false
+filesize: 0
