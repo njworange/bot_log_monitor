@@ -11,8 +11,10 @@ class ModuleForeignVod(PluginModuleBase):
             'foreign_vod_download_mode' : 'none', #Nothing, 모두받기, 블랙, 화이트
             'foreign_vod_blacklist_genre' : '',
             'foreign_vod_blacklist_program' : '',
+            'foreign_vod_blacklist_title' : '',
             'foreign_vod_whitelist_genre' : '',
             'foreign_vod_whitelist_program' : '',
+            'foreign_vod_whitelist_title' : '',
             'foreign_vod_watch_paths' : '/ROOT/GDRIVE/VIDEO/방송중/외국/\n/ROOT/GDRIVE/VIDEO/외국TV',  # 감시 경로 규칙 (줄바꿈으로 구분)
             'foreign_vod_item_last_list_option': '',
             f'{self.name}_db_delete_day': '30',
@@ -275,43 +277,57 @@ class ModuleForeignVod(PluginModuleBase):
 
     def condition_check_download_mode(self, item):
         try:
+            title_text = (item.filename or '').replace(' ', '').lower()
+            program_text = (item.meta_title or '').replace(' ', '').lower()
             foreign_vod_download_mode = P.ModelSetting.get('foreign_vod_download_mode')
             if foreign_vod_download_mode == 'none':
                 return False
             if foreign_vod_download_mode == 'blacklist':
                 flag_download = True
-                if item.meta_title is None:
-                    item.log += u'메타 정보 없음. 다운:On'
-                    return flag_download
                 foreign_vod_blacklist_genre = P.ModelSetting.get_list('foreign_vod_blacklist_genre', '|')
                 foreign_vod_blacklist_program = P.ModelSetting.get_list('foreign_vod_blacklist_program', '|')
-                if len(foreign_vod_blacklist_genre) > 0 and item.meta_genre in foreign_vod_blacklist_genre:
+                foreign_vod_blacklist_title = P.ModelSetting.get_list('foreign_vod_blacklist_title', '|')
+                if item.meta_title is None:
+                    item.log += u'메타 정보 없음. '
+                if item.meta_title is not None and len(foreign_vod_blacklist_genre) > 0 and item.meta_genre in foreign_vod_blacklist_genre:
                     flag_download = False
                     item.log += '제외 장르. 다운:Off'
-                if flag_download:
+                if flag_download and program_text:
                     for program_name in foreign_vod_blacklist_program:
-                        if item.meta_title.replace(' ', '').find(program_name.replace(' ', '')) != -1:
+                        if program_text.find(program_name.replace(' ', '').lower()) != -1:
                             flag_download = False
                             item.log += '제외 프로그램. 다운:Off'
+                            break
+                if flag_download and title_text:
+                    for title_name in foreign_vod_blacklist_title:
+                        if title_text.find(title_name.replace(' ', '').lower()) != -1:
+                            flag_download = False
+                            item.log += '제외 제목. 다운:Off'
                             break
                 if flag_download:
                     item.log += '블랙리스트 모드. 다운:On'
             else:
                 flag_download = False
-                if item.meta_title is None:
-                    item.log += '메타 정보 없음. 다운:Off'
-                    return flag_download
                 foreign_vod_whitelist_genre = P.ModelSetting.get_list('foreign_vod_whitelist_genre', '|')
                 foreign_vod_whitelist_program = P.ModelSetting.get_list('foreign_vod_whitelist_program', '|')
+                foreign_vod_whitelist_title = P.ModelSetting.get_list('foreign_vod_whitelist_title', '|')
+                if item.meta_title is None:
+                    item.log += '메타 정보 없음. '
 
-                if len(foreign_vod_whitelist_genre) > 0 and item.meta_genre in foreign_vod_whitelist_genre:
+                if item.meta_title is not None and len(foreign_vod_whitelist_genre) > 0 and item.meta_genre in foreign_vod_whitelist_genre:
                     flag_download = True
                     item.log += '포함 장르. 다운:On'
-                if flag_download == False:
+                if flag_download == False and program_text:
                     for program_name in foreign_vod_whitelist_program:
-                        if item.meta_title.replace(' ', '').find(program_name.replace(' ', '')) != -1:
+                        if program_text.find(program_name.replace(' ', '').lower()) != -1:
                             flag_download = True
                             item.log += '포함 프로그램. 다운:On'
+                            break
+                if flag_download == False and title_text:
+                    for title_name in foreign_vod_whitelist_title:
+                        if title_text.find(title_name.replace(' ', '').lower()) != -1:
+                            flag_download = True
+                            item.log += '포함 제목. 다운:On'
                             break
                 if not flag_download:
                     item.log += '화이트리스트 모드. 다운:Off'

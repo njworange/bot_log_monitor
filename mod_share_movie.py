@@ -19,10 +19,12 @@ class ModuleShareMovie(PluginModuleBase):
             f'{self.name}_blacklist_cate' : '',
             f'{self.name}_blacklist_genre' : '',
             f'{self.name}_blacklist_country' : '',
+            f'{self.name}_blacklist_title' : '',
             f'{self.name}_blacklist_year' : '',
             f'{self.name}_whitelist_cate' : '',
             f'{self.name}_whitelist_genre' : '',
             f'{self.name}_whitelist_country' : '',
+            f'{self.name}_whitelist_title' : '',
             f'{self.name}_whitelist_year' : '',
         }
         self.web_list_model = ModelShareMovieItem
@@ -138,6 +140,7 @@ class ModuleShareMovie(PluginModuleBase):
 
     def condition_check_download_mode(self, item):
         try:
+            title_text = (item.title or '').replace(' ', '').lower()
             download_mode = P.ModelSetting.get(f'{self.name}_download_mode')
             if download_mode == 'none':
                 item.log += '다운로드 모드: '
@@ -158,6 +161,12 @@ class ModuleShareMovie(PluginModuleBase):
                 if len(cond_country) > 0:
                     for country in item.country:
                         if country in cond_country:
+                            return False
+
+                cond_title = P.ModelSetting.get_list(f'{self.name}_blacklist_title', ',')
+                if title_text and len(cond_title) > 0:
+                    for title in cond_title:
+                        if title_text.find(title.replace(' ', '').lower()) != -1:
                             return False
 
                 cond_year = P.ModelSetting.get(f'{self.name}_blacklist_year')
@@ -183,6 +192,12 @@ class ModuleShareMovie(PluginModuleBase):
                 if len(cond_country) > 0:
                     for country in item.country:
                         if country in cond_country:
+                            return True
+
+                cond_title = P.ModelSetting.get_list(f'{self.name}_whitelist_title', ',')
+                if title_text and len(cond_title) > 0:
+                    for title in cond_title:
+                        if title_text.find(title.replace(' ', '').lower()) != -1:
                             return True
 
                 cond_year = P.ModelSetting.get(f'{self.name}_whitelist_year')
