@@ -1,5 +1,5 @@
 title: "봇 로그 모니터/다운로더"
-version: "0.0.0"
+version: "0.0.1"
 package_name: "bot_log_monitor"
 developer: "njworange"
 description: "GDS 업데이트 정보 수신 및 다운로드"
