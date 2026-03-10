@@ -30,10 +30,12 @@
       <div id="blacklist_div" class="collapse">
       {{ macros.setting_input_textarea('vod_blacklist_genre', '제외 장르', value=arg['vod_blacklist_genre'], row=3, desc=['빈칸인 경우 검사하지 않습니다. 구분자 | or 엔터']) }}
       {{ macros.setting_input_textarea('vod_blacklist_program', '제외 프로그램', value=arg['vod_blacklist_program'], row=10, desc=['이 곳에 있는 항목이 프로그램에 이름에 포함되어 있으면 다운로드 하지 않습니다. 구분자 | or 엔터']) }}
+      {{ macros.setting_input_textarea('vod_blacklist_title', '제외 제목', value=arg['vod_blacklist_title'], row=10, desc=['이 곳에 있는 항목이 파일 제목에 포함되어 있으면 다운로드 하지 않습니다. 구분자 | or 엔터']) }}
       </div>
       <div id="whitelist_div" class="collapse">
       {{ macros.setting_input_textarea('vod_whitelist_genre', '포함 장르', value=arg['vod_whitelist_genre'], row=3, desc=['빈칸인 경우 검사하지 않습니다. 구분자 | or 엔터']) }}
       {{ macros.setting_input_textarea('vod_whitelist_program', '포함 프로그램', value=arg['vod_whitelist_program'], row=10, desc=['이 곳에 있는 항목이 프로그램에 이름에 포함되어 있으면 다운로드합니다. 구분자 | or 엔터']) }}
+      {{ macros.setting_input_textarea('vod_whitelist_title', '포함 제목', value=arg['vod_whitelist_title'], row=10, desc=['이 곳에 있는 항목이 파일 제목에 포함되어 있으면 다운로드합니다. 구분자 | or 엔터']) }}
       </div>
     {{ macros.m_tab_content_end() }} 
     
