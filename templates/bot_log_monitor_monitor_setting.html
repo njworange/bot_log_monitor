@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+
+{{ macros.m_button_group([['globalSettingSaveBtn', '설정 저장']])}}
+{{ macros.m_row_start('5') }}
+{{ macros.m_row_end() }}
+
+<nav>  
+  {{ macros.m_tab_head_start() }}
+    {{ macros.m_tab_head('basic', '기본', true) }}
+    {{ macros.m_tab_head('tmdb', 'TMDB 설정', false) }}
+    {{ macros.m_tab_head('discord', 'Discord 알림', false) }}
+  {{ macros.m_tab_head_end() }}
+</nav> 
+
+<form id='setting'>
+  <div class="tab-content" id="nav-tabContent">
+    {{ macros.m_tab_content_start('basic', true) }}
+      {{ macros.setting_input_text('monitor_log_file_path', '로그 파일 경로', value=arg['monitor_log_file_path'], desc=['GDS Tool 로그 파일 경로']) }}
+      {{ macros.setting_input_text('monitor_scan_past_lines', '과거 로그 스캔 줄 수', value=arg['monitor_scan_past_lines'], desc=['플러그인 시작 시 스캔할 과거 로그 줄 수 (0 = 스캔 안함)']) }}
+      {{ macros.setting_checkbox('monitor_auto_start', '자동 시작', value=arg['monitor_auto_start'], desc=['FlaskFarm 시작 시 로그 모니터링 자동 시작']) }}
+      
+      {{ macros.m_row_start('10') }}
+      {{ macros.m_row_end() }}
+      
+      <div id="status_div" class="alert alert-info">
+        <strong>모니터 상태:</strong> <span id="status_text">확인 중...</span><br>
+        <strong>로그 파일:</strong> <span id="log_file_text">-</span>
+      </div>
+      
+      {{ macros.m_button_group([['start_monitor_btn', '모니터링 시작', 'success'], ['stop_monitor_btn', '모니터링 중지', 'danger']])}}
+      
+    {{ macros.m_tab_content_end() }}
+    
+    {{ macros.m_tab_content_start('tmdb', false) }}
+      {{ macros.setting_checkbox('monitor_tmdb_use_meta', 'TMDB 메타데이터 사용', value=arg['monitor_tmdb_use_meta'], desc=['영화 장르, 국가, 포스터 정보를 TMDB에서 가져옵니다']) }}
+      {{ macros.setting_input_text('monitor_tmdb_api_key', 'TMDB API 키', value=arg['monitor_tmdb_api_key'], desc=['TMDB API 키 (https://www.themoviedb.org/settings/api 에서 발급)', '무료로 발급 가능합니다']) }}
+      
+      {{ macros.m_row_start('10') }}
+      {{ macros.m_row_end() }}
+      
+      <div class="alert alert-warning">
+        <strong>📌 TMDB API 키 발급 방법:</strong><br>
+        1. <a href="https://www.themoviedb.org/signup" target="_blank">TMDB 회원가입</a> (무료)<br>
+        2. <a href="https://www.themoviedb.org/settings/api" target="_blank">설정 &gt; API</a> 메뉴에서 API 키 신청<br>
+        3. "API Key (v3 auth)" 복사하여 위에 입력<br>
+        <br>
+        <strong>주의:</strong> API 키 없이도 플러그인은 작동하지만, 장르/국가 정보가 비어있게 됩니다.
+      </div>
+      
+    {{ macros.m_tab_content_end() }}
+    
+    {{ macros.m_tab_content_start('discord', false) }}
+      {{ macros.setting_checkbox('monitor_discord_use_notify', 'Discord 알림 사용', value=arg['monitor_discord_use_notify'], desc=['복사 요청 및 에러 발생 시 디스코드로 알림을 보냅니다']) }}
+      {{ macros.setting_input_text('monitor_discord_webhook_url', 'Discord 웹훅 URL', value=arg['monitor_discord_webhook_url'], desc=['Discord 채널의 웹훅 URL을 입력하세요']) }}
+      
+      {{ macros.m_row_start('10') }}
+      {{ macros.m_row_end() }}
+      
+      <div class="alert alert-info">
+        <strong>📌 Discord 웹훅 URL 생성 방법:</strong><br>
+        1. Discord에서 알림을 받을 채널 선택<br>
+        2. 채널 설정 > 연동 > 웹훅 보기<br>
+        3. "새 웹훅" 버튼 클릭<br>
+        4. 웹훅 이름 설정 후 "웹훅 URL 복사"<br>
+        5. 위에 붙여넣기<br>
+        <br>
+        <strong>알림 종류:</strong><br>
+        - 🎬 국내 VOD 복사 요청 (초록색)<br>
+        - 🌍 외국 VOD 복사 요청 (파란색)<br>
+        - 🎥 영화 복사 요청 (주황색)<br>
+        - ⚠️ 에러 발생 (빨간색)
+      </div>
+      
+    {{ macros.m_tab_content_end() }}
+  </div>
+</form>
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+  update_status();
+});
+
+function update_status() {
+  $.ajax({
+    url: '/'+package_name+'/ajax/' + sub + '/status',
+    type: "POST", 
+    cache: false,
+    dataType: "json",
+    success: function (data) {
+      if (data.success) {
+        if (data.running) {
+          $('#status_text').text('실행 중 ✅').css('color', 'green');
+        } else {
+          $('#status_text').text('중지됨 ❌').css('color', 'red');
+        }
+        $('#log_file_text').text(data.log_file);
+      }
+    }
+  });
+}
+
+$("body").on('click', '#start_monitor_btn', function(e){
+  e.preventDefault();
+  globalSendCommand('start');
+  setTimeout(update_status, 1000);
+});
+
+$("body").on('click', '#stop_monitor_btn', function(e){
+  e.preventDefault();
+  globalSendCommand('stop');
+  setTimeout(update_status, 1000);
+});
+
+</script>    
+{% endblock %}
+

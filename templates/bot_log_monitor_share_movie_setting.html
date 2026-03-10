@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+
+{{ macros.m_button_group([['globalSettingSaveBtn', '설정 저장']])}}
+{{ macros.m_row_start('5') }}
+{{ macros.m_row_end() }}
+
+<nav>  
+  {{ macros.m_tab_head_start() }}
+    {{ macros.m_tab_head('basic', '기본', true) }}
+    {{ macros.m_tab_head('blacklist', '블랙리스트 조건', false) }}
+    {{ macros.m_tab_head('whitelist', '화이트리스트 조건', false) }}
+    {{ macros.m_tab_head('db', 'DB', false) }}
+  {{ macros.m_tab_head_end() }}
+</nav> 
+
+<form id='setting'>
+  <div class="tab-content" id="nav-tabContent">
+    {{ macros.m_tab_content_start('basic', true) }}
+      {{ macros.setting_input_text('share_movie_remote_path', '공유 기능 사용시 리모트 경로', value=arg['share_movie_remote_path'], desc=['구글 드라이브 공유 플러그인이 설치되어 있어야 합니다.']) }}
+      {{ macros.setting_checkbox('share_movie_use_notify', '알림 사용', value=arg['share_movie_use_notify'], desc=['메시지 ID : bot_log_monitor_share_movie']) }}
+      {{ macros.setting_radio_with_value('share_movie_download_mode', '다운로드 모드', [['none', '다운로드 안함'], ['blacklist', '블랙리스트'], ['whitelist', '화이트리스트']], value=arg['share_movie_download_mode'], desc=None) }}
+      
+      {{ macros.m_row_start('10') }}
+      {{ macros.m_row_end() }}
+      
+      {{ macros.setting_input_textarea('share_movie_watch_paths', '감시 경로 규칙', value=arg['share_movie_watch_paths'], row=5, desc=['이 경로가 포함된 폴더만 처리합니다 (화이트리스트 방식, 줄바꿈으로 구분)', '비워두면 모든 경로 허용', '예: /ROOT/GDRIVE/VIDEO/영화/', '예: /ROOT/GDRIVE/VIDEO/영화/UHD/']) }}
+    {{ macros.m_tab_content_end() }} 
+
+    {{ macros.m_tab_content_start('blacklist', false) }}
+      {{ macros.setting_input_textarea('share_movie_blacklist_cate', '제외 카테고리', value=arg['share_movie_blacklist_cate'], row=3, desc=['빈칸인 경우 검사하지 않습니다. 구분자 , ']) }}
+      {{ macros.setting_input_textarea('share_movie_blacklist_genre', '제외 장르', value=arg['share_movie_blacklist_genre'], row=3, desc=['빈칸인 경우 검사하지 않습니다. 구분자 , ']) }}
+      {{ macros.setting_input_textarea('share_movie_blacklist_country', '제외 국가', value=arg['share_movie_blacklist_country'], row=3, desc=['빈칸인 경우 검사하지 않습니다. 구분자 , ']) }}
+      {{ macros.setting_input_text('share_movie_blacklist_year', '제외 년도', value=arg['share_movie_blacklist_year'], desc=['빈칸인 경우 검사하지 않습니다.', '형식: 최소년도-최대년도']) }}
+    {{ macros.m_tab_content_end() }} 
+
+    {{ macros.m_tab_content_start('whitelist', false) }}
+      {{ macros.info_text('', '조건', "조건은 OR로 동작합니다. 하나의 조건만 받음") }}
+      {{ macros.setting_input_textarea('share_movie_whitelist_cate', '포함 카테고리', value=arg['share_movie_whitelist_cate'], row=3, desc=['빈칸인 경우 검사하지 않습니다. 구분자 , ']) }}
+      {{ macros.setting_input_textarea('share_movie_whitelist_genre', '포함 장르', value=arg['share_movie_whitelist_genre'], row=3, desc=['빈칸인 경우 검사하지 않습니다. 구분자 , ']) }}
+      {{ macros.setting_input_textarea('share_movie_whitelist_country', '포함 국가', value=arg['share_movie_whitelist_country'], row=3, desc=['빈칸인 경우 검사하지 않습니다. 구분자 , ']) }}
+      {{ macros.setting_input_text('share_movie_whitelist_year', '포함 년도', value=arg['share_movie_whitelist_year'], desc=['빈칸인 경우 검사하지 않습니다.', '형식: 최소년도-최대년도']) }}
+    {{ macros.m_tab_content_end() }} 
+    
+    {{ macros.m_tab_content_start('db', false) }}
+      {{ macros.setting_input_text_and_buttons('share_movie_db_delete_day', 'DB 삭제 기간', [['globalDbDeleteDayBtn', '기간 적용 삭제', [['tag_id','share_movie_db_delete_day']]], ['globalDbDeleteBtn', '전체 삭제']], value=arg['share_movie_db_delete_day'], col='6') }} 
+      {{ macros.setting_checkbox('share_movie_db_auto_delete', 'DB 자동 삭제', value=arg['share_movie_db_auto_delete'], desc=['On : 기간 적용하여 DB를 자동 삭제합니다.']) }}
+    {{ macros.m_tab_content_end() }} 
+</form>
+
+<script type="text/javascript">
+
+</script>    
+{% endblock %}
+
